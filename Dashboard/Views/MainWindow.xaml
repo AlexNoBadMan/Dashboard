@@ -1,0 +1,400 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dashboard.Views"
+        xmlns:gl="clr-namespace:System.Globalization;assembly=mscorlib"
+        xmlns:vm="clr-namespace:Dashboard.ViewModels"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:converters="clr-namespace:Dashboard.Converters"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:b="clr-namespace:Dashboard.Behaviors"
+        x:Class="Dashboard.Views.MainWindow"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1650"
+        d:DataContext="{d:DesignInstance {x:Type vm:MainViewModel}}"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource MaterialDesignWindow}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <converters:InitialsConverter x:Key="InitialsConverter"/>
+            <converters:ProductNameConverter x:Key="ProductNameConverter"/>
+            <converters:MillionConverter x:Key="MillionConverter"/>
+            <converters:LengthPercentageConverter x:Key="LengthPercentageConverter"/>
+            <Style TargetType="{x:Type Window}" x:Key="MaterialDesignWindow">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="TextElement.FontWeight" Value="Regular" />
+                <Setter Property="TextElement.FontSize" Value="13" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+                <Setter Property="TextOptions.TextRenderingMode" Value="Auto" />
+                <Setter Property="FontFamily" Value="{md:MaterialDesignFont}" />
+            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- you only need bring this resource in if you want to specify the circular style statically -->
+                <ResourceDictionary Source="/Dashboard;component/Resources/Styles/CircularProgressBar.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <md:DialogHost Identifier="RootDialog" DialogTheme="Inherit">
+        <md:DrawerHost IsLeftDrawerOpen="{Binding IsChecked, ElementName=MenuToggleButton}">
+            <md:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="220">
+                    <ToggleButton 
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                        DockPanel.Dock="Top"
+                        HorizontalAlignment="Right" 
+                        Margin="16"
+                        IsChecked="{Binding IsChecked, ElementName=MenuToggleButton, Mode=TwoWay}"/>
+
+                    <TextBox 
+                        x:Name="DemoItemsSearchBox"
+                        DockPanel.Dock="Top"
+                        Margin="16, 4"
+                        Width="200"
+                        md:HintAssist.Hint="Search"
+                        md:HintAssist.IsFloating="True"
+                        md:TextFieldAssist.HasClearButton="True"
+                        md:TextFieldAssist.HasOutlinedTextField="True"
+                        md:TextFieldAssist.DecorationVisibility="Collapsed"
+                        md:TextFieldAssist.TextFieldCornerRadius="4"/>
+
+                    <ListBox 
+                        x:Name="DemoItemsListBox" 
+                        Margin="0 16 0 16"
+                        AutomationProperties.Name="DemoPagesListBox">
+                    </ListBox>
+                </DockPanel>
+            </md:DrawerHost.LeftDrawerContent>
+
+            <DockPanel>
+                <md:ColorZone  Padding="6" md:ShadowAssist.ShadowDepth="Depth2" DockPanel.Dock="Top">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <ToggleButton x:Name="MenuToggleButton" Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False" AutomationProperties.Name="HamburgerToggleButton"/>
+                        </StackPanel>
+                        <md:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
+                            <!--<StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                                    <TextBlock Text="Light" Margin="0 0 10 0"/>
+                                    <ToggleButton x:Name="DarkModeToggleButton" />
+                                    <TextBlock Text="Dark" Margin="10 0 0 0"/>
+                                </StackPanel>
+
+                                <Separator/>
+
+                                <Button Content="Hello World"/>
+
+                                <Button Content="Nice Popup"/>
+
+                                <Button Content="Can't Touch This" IsEnabled="False"/>
+
+                                <Separator/>
+
+                                <Button Content="Goodbye"/>
+                            </StackPanel>-->
+                        </md:PopupBox>
+                        
+                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding IsDarkTheme}"
+                                      Style="{StaticResource MaterialDesignActionToggleButton}" Focusable="False"
+                                      Content="{md:PackIcon Kind=WeatherNight}" md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=WhiteBalanceSunny}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Image Margin="0,0,5,0" Width="32" Height="32" Source="/Resources/Icons/Ascon.png" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding SelectedReport.Name}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                        </StackPanel>
+                    </DockPanel>
+                </md:ColorZone>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.ColumnSpan="3" Margin="18,18,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <StackPanel Margin="-2" Orientation="Horizontal">
+                            <TextBlock Text="Dashboard" Style="{StaticResource MaterialDesignHeadline4TextBlock}"/>
+                            <Button Margin="8 0 0 0" Command="{Binding OpenReportCommand}" Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center" >
+                                <TextBlock Text="Загрузить" TextDecorations="Underline"></TextBlock>
+                            </Button>
+
+                        </StackPanel>
+                        <ComboBox ItemsSource="{Binding Reports}" SelectedItem="{Binding SelectedReport}" 
+                                  md:ComboBoxAssist.ShowSelectedItem="False">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding ReportInformation}"/>
+                                        <ToggleButton Grid.Column="1" Padding="0" Margin="3,0,0,0" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                            Command="{Binding DataContext.DeleteReportCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Focusable="False">
+                                            <ToggleButton.Style>
+                                                <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignToolButton}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ToggleButton.Style>
+                                            <md:PackIcon Kind="CloseThick" Foreground="#FFE24D40" Width="16" Height="16"></md:PackIcon>
+                                        </ToggleButton>
+
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <md:Card HorizontalAlignment="Right" Grid.ColumnSpan="3" Margin="18 18 18 0">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="DateRange" Width="24" Height="24" VerticalAlignment="Center" Margin="8 12 8 12" />
+                            <ListBox Style="{StaticResource MaterialDesignToolToggleFlatListBox}" SelectedItem="{Binding SelectedPeriod}" ItemsSource="{Binding SelectedReport.Periods}" SelectedIndex="0" VerticalAlignment="Center" Margin="0,0,8,0">
+                                <ListBox.Resources>
+                                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignToolToggleListBoxItem}">
+                                        <Setter Property="Padding" Value="4 6 4 6"/>
+                                    </Style>
+                                </ListBox.Resources>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </md:Card>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="2.2*"/>
+                        </Grid.ColumnDefinitions>
+                        <md:Card Grid.Column="0" Margin="18 18 0 0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Margin="14 14 14 4" Text="ВЫПОЛНЕНИЕ ПЛАНА ПРОДАЖ" Style="{StaticResource MaterialDesignHeadline4TextBlock}"/>
+                                <Separator Grid.Row="1" Grid.ColumnSpan="2"  Margin="8 0 8 0" Style="{StaticResource MaterialDesignDarkSeparator}"/>
+                                <Grid Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Margin="16 16 16 4" Text="ФАКТ ВЫПОЛНЕНИЯ" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+                                    <Grid Grid.Row="1" Margin="14">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Fill="{StaticResource PrimaryHueMidBrush}" Width="16" Height="16"/>
+                                                <TextBlock Text=" ВП" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Fill="{StaticResource SecondaryHueLightBrush}" Width="16" Height="16"/>
+                                                <TextBlock Text=" ВВ" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <ProgressBar x:Name="CircularProgressProfit" Height="220" Width="220" Value="{Binding SelectedPeriod.GrossProfit.PercentageCompletion, Mode=OneWay}" Style="{DynamicResource CircularProgressBarStyle}" >
+                                            <i:Interaction.Behaviors>
+                                                <b:ProgresBarAnimateBehavior />
+                                            </i:Interaction.Behaviors>
+                                        </ProgressBar>
+                                        <ProgressBar x:Name="CircularProgressProceeds" Height="190" Width="190" Value="{Binding SelectedPeriod.GrossProceeds.PercentageCompletion, Mode=OneWay}" Foreground="{StaticResource SecondaryHueLightBrush}" Style="{StaticResource CircularProgressBarStyle}">
+                                            <i:Interaction.Behaviors>
+                                                <b:ProgresBarAnimateBehavior />
+                                            </i:Interaction.Behaviors>
+                                        </ProgressBar>
+                                        <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Margin="0 0 -15 40" >
+                                                <Run Text="{Binding Value, ElementName=CircularProgressProfit, StringFormat={}{0:N0}, Mode=OneWay, TargetNullValue='0'}" Foreground="{StaticResource PrimaryHueMidBrush}" FontSize="42"></Run><Run Text="%" FontSize="20" BaselineAlignment="TextTop"></Run>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="1" Text="/" FontSize="42" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" VerticalAlignment="Bottom">
+                                                <Run Text="{Binding Value, ElementName=CircularProgressProceeds, StringFormat={}{0:N0}, Mode=OneWay, TargetNullValue='0'}" Foreground="{StaticResource SecondaryHueLightBrush}" FontSize="42"></Run><Run Text="%" FontSize="20" BaselineAlignment="TextTop"></Run>
+                                            </TextBlock>
+                                        </Grid>
+
+                                    </Grid>
+                                </Grid>
+                                <StackPanel Margin="14" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch">
+                                    <!--<StackPanel Orientation="Horizontal">
+                                        <Rectangle Fill="{StaticResource PrimaryHueMidBrush}" Width="16" Height="16" Margin="0 0 3 0"/>
+                                        <TextBlock Text="План" Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                    </StackPanel>-->
+                                    <TextBlock Text="План" Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                    <TextBlock Text="{Binding SelectedPeriod.GrossProfit.Plan, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" 
+                                               Style="{StaticResource MaterialDesignHeadline4TextBlock}" Foreground="{StaticResource PrimaryHueMidBrush}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="Факт" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+                                    <TextBlock Text="{Binding SelectedPeriod.GrossProfit.Fact, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" 
+                                               Style="{StaticResource MaterialDesignHeadline4TextBlock}" Foreground="{StaticResource PrimaryHueMidBrush}" HorizontalAlignment="Right"/>
+
+                                    <!--<StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                                        <Rectangle Fill="{StaticResource SecondaryHueLightBrush}" Width="16" Height="16" Margin="0 0 3 0"/>
+                                        <TextBlock Text="План" Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                    </StackPanel>-->
+                                    <TextBlock Text="План" Style="{StaticResource MaterialDesignHeadline5TextBlock}" Margin="0 12 0 0"/>
+
+                                    <TextBlock Text="{Binding SelectedPeriod.GrossProceeds.Plan, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" 
+                                               Style="{StaticResource MaterialDesignHeadline4TextBlock}" Foreground="{StaticResource SecondaryHueMidBrush}" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="Факт" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+                                    <TextBlock Text="{Binding SelectedPeriod.GrossProceeds.Fact, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" 
+                                               Style="{StaticResource MaterialDesignHeadline4TextBlock}" Foreground="{StaticResource SecondaryHueMidBrush}"  HorizontalAlignment="Right"/>
+                                </StackPanel>
+                            </Grid>
+                        </md:Card>
+                        <md:Card Grid.Column="2" Margin="0 18 18 0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Margin="14 14 14 4" Text="ПЛАН/ФАКТ В РАЗРЕЗЕ млн." Style="{StaticResource MaterialDesignHeadline4TextBlock}"/>
+                                <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="8 0 8 0" Style="{StaticResource MaterialDesignDarkSeparator}"/>
+                                <StackPanel Grid.Row="2" Margin="16">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Fill="#FF528BCC" Width="16" Height="16"/>
+                                        <TextBlock Text=" План" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Fill="#FF409740" Width="16" Height="16"/>
+                                        <TextBlock Text=" Факт" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Style="{StaticResource MaterialDesignScrollViewer}">
+                                    <ItemsControl Grid.Row="2" Margin="0,0,0,14" ItemsSource="{Binding SelectedPeriod.Products}">
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            </Style >
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"></UniformGrid>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Bottom">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <StackPanel VerticalAlignment="Bottom">
+                                                            <TextBlock Text="{Binding Revenue.Plan, StringFormat=N3, Converter={StaticResource MillionConverter}}" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignBody1TextBlock}"></TextBlock>
+                                                            <ProgressBar Margin="2 0" Foreground="#FF528BCC" Height="50" Value="100"
+                                                                     BorderThickness="0" Background="Transparent" VerticalAlignment="Bottom" Orientation="Vertical">
+                                                                <ProgressBar.Width>
+                                                                    <MultiBinding Converter="{StaticResource LengthPercentageConverter}">
+                                                                        <Binding Path="Revenue.Plan"/>
+                                                                        <Binding Path="DataContext.SelectedPeriod.PlanSumProducts" RelativeSource="{RelativeSource AncestorType=Window}"></Binding>
+                                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                    </MultiBinding>
+                                                                </ProgressBar.Width>
+                                                            </ProgressBar>
+                                                        </StackPanel>
+                                                        <StackPanel VerticalAlignment="Bottom">
+                                                            <TextBlock Text="{Binding Revenue.Fact, StringFormat=N3, Converter={StaticResource MillionConverter}}" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignBody1TextBlock}"></TextBlock>
+                                                            <ProgressBar Margin="2 0" Foreground="#FF409740" Height="50" Value="100"
+                                                                     BorderThickness="0" Background="Transparent" VerticalAlignment="Bottom" Orientation="Vertical">
+                                                                <ProgressBar.Width>
+                                                                    <MultiBinding Converter="{StaticResource LengthPercentageConverter}">
+                                                                        <Binding Path="Revenue.Fact"/>
+                                                                        <Binding Path="DataContext.SelectedPeriod.PlanSumProducts" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                    </MultiBinding>
+                                                                </ProgressBar.Width>
+                                                            </ProgressBar>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Name, Converter={StaticResource ProductNameConverter}}" HorizontalAlignment="Center" TextWrapping="WrapWithOverflow" Style="{StaticResource MaterialDesignBody1TextBlock}"></TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </md:Card>
+                        <GridSplitter Grid.Column="1" Width="18" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Transparent"></GridSplitter>
+                    </Grid>
+                    <ScrollViewer Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" Margin="9 -9 9 0" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
+                                  Style="{StaticResource MaterialDesignScrollViewer}"
+                                  MouseUp="UIElement_OnMouseUp"
+                                  PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+                                  PreviewMouseMove="UIElement_OnPreviewMouseMove">
+                        <ItemsControl ItemsSource="{Binding SelectedPeriod.Users}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="2"></UniformGrid>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <md:Card Margin="9">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <DockPanel Grid.Row="0" Margin="12,12,12,4">
+                                                <md:PackIcon DockPanel.Dock="Left" Kind="UserBadge" Width="32" Height="32" VerticalAlignment="Center"/>
+                                                <TextBlock DockPanel.Dock="Right" Grid.Row="1" Text="{Binding GrossProfit.PercentageCompletion, StringFormat={}{0:N0}%}" FontSize="42" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                <TextBlock Margin="5,0,15,0" Text="{Binding Name, Converter={StaticResource InitialsConverter}}" Style="{StaticResource MaterialDesignHeadline4TextBlock}" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                            <StackPanel Grid.Row="1" Margin="16,5">
+                                                <TextBlock Text="Валовая прибыль" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                <DockPanel Margin="0" LastChildFill="False">
+                                                    <StackPanel DockPanel.Dock="Left">
+                                                        <TextBlock Text="{Binding GrossProfit.Fact, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                    </StackPanel>
+                                                    <StackPanel DockPanel.Dock="Right">
+                                                        <TextBlock Text="{Binding GrossProfit.Plan, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                                <ProgressBar Grid.Row="1" Height="24" Background="Transparent" Foreground="{StaticResource PrimaryHueMidBrush}" Value="{Binding GrossProfit.PercentageCompletion, Mode=OneWay}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="2" Margin="16,5,16,20">
+                                                <TextBlock  Text="Валовая выручка" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                <DockPanel Margin="0" LastChildFill="False">
+                                                    <StackPanel DockPanel.Dock="Left">
+                                                        <TextBlock Text="{Binding GrossProceeds.Fact, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                    </StackPanel>
+                                                    <StackPanel DockPanel.Dock="Right">
+                                                        <TextBlock Text="{Binding GrossProceeds.Plan, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" Style="{StaticResource MaterialDesignHeadline5TextBlock}"></TextBlock>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                                <ProgressBar Grid.Row="1" Height="24" Background="Transparent" BorderBrush="{StaticResource SecondaryHueMidBrush}" Foreground="{StaticResource SecondaryHueLightBrush}" Value="{Binding GrossProceeds.PercentageCompletion, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </md:Card>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <GridSplitter Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Height="18" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Transparent"></GridSplitter>
+                </Grid>
+            </DockPanel>
+        </md:DrawerHost>
+
+
+    </md:DialogHost>
+</Window>
