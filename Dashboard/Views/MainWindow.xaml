@@ -22,6 +22,7 @@
             <converters:ProductNameConverter x:Key="ProductNameConverter"/>
             <converters:MillionConverter x:Key="MillionConverter"/>
             <converters:LengthPercentageConverter x:Key="LengthPercentageConverter"/>
+            <converters:MaxProgressValueConverter x:Key="MaxProgressValueConverter"/>
             <Style TargetType="{x:Type Window}" x:Key="MaterialDesignWindow">
                 <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -179,7 +180,7 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
@@ -194,7 +195,7 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Margin="16 16 16 4" Text="ФАКТ ВЫПОЛНЕНИЯ" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
-                                    <Grid Grid.Row="1" Margin="14">
+                                    <Grid Grid.Row="1" Margin="16">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <Rectangle Fill="{StaticResource PrimaryHueMidBrush}" Width="16" Height="16"/>
@@ -205,12 +206,18 @@
                                                 <TextBlock Text=" ВВ" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
                                             </StackPanel>
                                         </StackPanel>
-                                        <ProgressBar x:Name="CircularProgressProfit" Height="220" Width="220" Value="{Binding SelectedPeriod.GrossProfit.PercentageCompletion, Mode=OneWay}" Style="{DynamicResource CircularProgressBarStyle}" >
+                                        <ProgressBar x:Name="CircularProgressProfit" Height="240" Width="240" 
+													 Value="{Binding SelectedPeriod.GrossProfit.PercentageCompletion, Mode=OneWay}"
+													 Maximum="{Binding SelectedPeriod.GrossProfit.PercentageCompletion, Converter={StaticResource MaxProgressValueConverter}}"
+													 Style="{DynamicResource CircularProgressBarStyle}" >
                                             <i:Interaction.Behaviors>
                                                 <b:ProgresBarAnimateBehavior />
                                             </i:Interaction.Behaviors>
                                         </ProgressBar>
-                                        <ProgressBar x:Name="CircularProgressProceeds" Height="190" Width="190" Value="{Binding SelectedPeriod.GrossProceeds.PercentageCompletion, Mode=OneWay}" Foreground="{StaticResource SecondaryHueLightBrush}" Style="{StaticResource CircularProgressBarStyle}">
+                                        <ProgressBar x:Name="CircularProgressProceeds" Height="210" Width="210" 
+													 Value="{Binding SelectedPeriod.GrossProceeds.PercentageCompletion, Mode=OneWay}"
+													 Maximum="{Binding SelectedPeriod.GrossProceeds.PercentageCompletion, Converter={StaticResource MaxProgressValueConverter}}"
+													 Style="{StaticResource CircularProgressBarStyle}" Foreground="{StaticResource SecondaryHueLightBrush}">
                                             <i:Interaction.Behaviors>
                                                 <b:ProgresBarAnimateBehavior />
                                             </i:Interaction.Behaviors>
@@ -229,7 +236,6 @@
                                                 <Run Text="{Binding Value, ElementName=CircularProgressProceeds, StringFormat={}{0:N0}, Mode=OneWay, TargetNullValue='0'}" Foreground="{StaticResource SecondaryHueLightBrush}" FontSize="42"></Run><Run Text="%" FontSize="20" BaselineAlignment="TextTop"></Run>
                                             </TextBlock>
                                         </Grid>
-
                                     </Grid>
                                 </Grid>
                                 <StackPanel Margin="14" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch">

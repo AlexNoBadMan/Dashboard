@@ -71,6 +71,7 @@
     <Compile Include="Behaviors\ProgresBarAnimateBehavior.cs" />
     <Compile Include="Converters\InitialsConverter.cs" />
     <Compile Include="Converters\LengthPercentageConverter.cs" />
+    <Compile Include="Converters\MaxProgressValueConverter.cs" />
     <Compile Include="Converters\MillionConverter.cs" />
     <Compile Include="Converters\ProductNameConverter.cs" />
     <Compile Include="DelegateCommand\DelegateCommand.cs" />
