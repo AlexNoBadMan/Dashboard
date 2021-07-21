@@ -101,9 +101,10 @@ namespace Dashboard.Services
             return users;
         }
 
+        private static readonly CultureInfo _cultureInfo = new("ru-RU");
         private static double Parse(string value)
         {
-            double.TryParse(value, out var dvlaue);
+            double.TryParse(value, NumberStyles.Any, _cultureInfo, out var dvlaue);
             return dvlaue;
         }
     }
