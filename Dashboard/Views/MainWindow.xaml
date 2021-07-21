@@ -130,7 +130,7 @@
 
                         </StackPanel>
                         <ComboBox ItemsSource="{Binding Reports}" SelectedItem="{Binding SelectedReport}" 
-                                  md:ComboBoxAssist.ShowSelectedItem="False">
+                                  md:ComboBoxAssist.ShowSelectedItem="True">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
